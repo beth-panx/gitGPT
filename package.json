@@ -1,0 +1,23 @@
+{
+  "name": "git-gpt",
+  "version": "0.1.0",
+  "description": "A CLI that will take in natural language and output git commands",
+  "author": "Beth Pan",
+  "keywords": [],
+  "license": "MIT",
+  "main": "index.js",
+  "bin": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node index.js"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.3",
+    "figlet": "^1.5.2",
+    "openai": "^3.2.1",
+    "simple-git": "^3.17.0"
+  }
+}
