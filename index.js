@@ -19,42 +19,43 @@ const rl = readline.createInterface({
 
 console.log(figlet.textSync("Git GPT"));
 
-rl.question('What do you want to do with Git?\n ', async (prompt) => {
-  const request = {
-    max_tokens: 100,
-    temperature: 0.2,
-    model:"gpt-3.5-turbo",
-    messages: [
-      {"role": "system", "content": `You are a helpful assistant. Output a git command only from the following conversation, no explanation or other text: ${prompt}`},
-    ]
-  }
 
-  openai.createChatCompletion(request)
-  .then((response) => {
-    const gitCommand = response.data.choices[0].message.content;
-    console.log("git command: ", response.data.choices[0].message.content);
+async function generateGitCommand(prompt) {
+    const request = {
+        max_tokens: 100,
+        temperature: 0.2,
+        model:"gpt-3.5-turbo",
+        messages: [
+            {"role": "system", "content": `You are a helpful assistant. Output a git command only from the following conversation, no explanation or other text: ${prompt}`},
+        ]
+    }
+    const response = await openai.createChatCompletion(request);
 
-    rl.question('Do you want to execute this Git command? (y/n)', (answer) => {
-      if (answer === 'y') {
-        exec(gitCommand, (error, stdout, stderr) => {
+    return response.data.choices[0].message.content;
+}
+
+rl.setPrompt('Describe what you would like to do with Git?\n ');
+rl.prompt();
+
+rl.on('line', async (input) => {
+    const command = await generateGitCommand(input);
+
+    console.log("Git command: ", command);
+
+    rl.question(`Are you sure you want to execute the following command: ${command} (y/n)? `, (answer) => {
+      if (answer.toLowerCase() === 'y') {
+        exec(command, (error, stdout, stderr) => {
           if (error) {
-            console.error(`exec error: ${error}`);
-            console.error(`stderr: ${stderr}`)
-
-            return;
+            console.error(`Error executing command: ${error.message}`);
+            console.log(stderr);
+          } else {
+            console.log(stdout);
           }
-          console.log(`Git command executed! Message: ${stdout}`);
+          rl.prompt();
         });
       } else {
-        console.log('Any other command?');
+        console.log('Command execution cancelled.');
+        rl.prompt();
       }
-
-      rl.close();
     });
-  })
-  .catch((err) => {
-    console.log(err);
-    rl.close();
   });
-});
-
