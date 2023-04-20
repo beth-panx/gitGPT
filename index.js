@@ -19,7 +19,6 @@ const rl = readline.createInterface({
 
 console.log(figlet.textSync("Git GPT"));
 
-
 async function generateGitCommand(prompt) {
     const request = {
         max_tokens: 100,
@@ -34,13 +33,13 @@ async function generateGitCommand(prompt) {
     return response.data.choices[0].message.content;
 }
 
-rl.setPrompt('Describe what you would like to do with Git?\n ');
+rl.setPrompt('Describe what you would like to do with Git:\n ');
 rl.prompt();
 
 rl.on('line', async (input) => {
     const command = await generateGitCommand(input);
 
-    console.log("Git command: ", command);
+    console.log('Git command: ', command);
 
     rl.question(`Are you sure you want to execute the following command: ${command} (y/n)? `, (answer) => {
       if (answer.toLowerCase() === 'y') {
